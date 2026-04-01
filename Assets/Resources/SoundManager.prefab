@@ -51,10 +51,16 @@ MonoBehaviour:
   bgmSource: {fileID: 4859493318951858545}
   seSource: {fileID: 7991369128355347757}
   vcSource: {fileID: 3230951252187884656}
-  seList: []
+  seList:
+  - name: down
+    clip: {fileID: 8300000, guid: 12a71b299e31c874990cf41623383c4d, type: 3}
+    volume: 1
   vcList:
   - name: ikareru
     clip: {fileID: 8300000, guid: e21bd231dd370934fa848e6b2b2d8e69, type: 3}
+    volume: 1
+  - name: seizyou
+    clip: {fileID: 8300000, guid: 13b5b06cd63606b4fad6cc52a7436bc0, type: 3}
     volume: 1
 --- !u!82 &4859493318951858545
 AudioSource:
