@@ -52,7 +52,10 @@ MonoBehaviour:
   seSource: {fileID: 7991369128355347757}
   vcSource: {fileID: 3230951252187884656}
   seList: []
-  vcList: []
+  vcList:
+  - name: ikareru
+    clip: {fileID: 8300000, guid: e21bd231dd370934fa848e6b2b2d8e69, type: 3}
+    volume: 1
 --- !u!82 &4859493318951858545
 AudioSource:
   m_ObjectHideFlags: 0
