@@ -97,3 +97,6 @@ InitTestScene*.unity*
 
 # Auto-generated scenes by play mode tests
 /[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
+Assets/Image/タイトル・ホーム画面UI/button_backtitle.png
+Assets/Image/
+Assets/Font/
