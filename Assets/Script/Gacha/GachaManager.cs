@@ -27,7 +27,7 @@ public class GachaManager : MonoBehaviour
     [SerializeField] private int _tenCost = 10;
 
     [Header("鍵初期所持数")]
-    [SerializeField] private int _initialKeyCount = 0;
+    [SerializeField] private int _initialKeyCount = 100;
 
     [Header("ガチャプール（全アイテム）")]
     [SerializeField] private GachaItem[] _ssrItems;
