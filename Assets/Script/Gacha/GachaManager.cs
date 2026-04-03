@@ -26,6 +26,9 @@ public class GachaManager : MonoBehaviour
     [SerializeField] private int _singleCost = 1;
     [SerializeField] private int _tenCost = 10;
 
+    [Header("鍵初期所持数")]
+    [SerializeField] private int _initialKeyCount = 0;
+
     [Header("ガチャプール（全アイテム）")]
     [SerializeField] private GachaItem[] _ssrItems;
     [SerializeField] private GachaItem[] _srItems;
@@ -38,13 +41,8 @@ public class GachaManager : MonoBehaviour
     // 内部状態
     // -------------------------------------------------------
 
-    /// <summary>現在のPickUpキャラ（nullなら未選択）</summary>
     private GachaItem _selectedPickUp = null;
-
-    /// <summary>所持アイテム（アイテム → 個数）</summary>
     private readonly Dictionary<GachaItem, int> _inventory = new();
-
-    /// <summary>所持鍵の数</summary>
     private int _keyCount = 0;
 
     public int KeyCount => _keyCount;
@@ -64,15 +62,14 @@ public class GachaManager : MonoBehaviour
         }
         Instance = this;
         DontDestroyOnLoad(gameObject);
+
+        _keyCount = _initialKeyCount;
     }
 
     // -------------------------------------------------------
     // PickUp選択
     // -------------------------------------------------------
 
-    /// <summary>
-    /// PickUpキャラを選択します。nullを渡すと解除。
-    /// </summary>
     public void SelectPickUp(GachaItem character)
     {
         _selectedPickUp = character;
@@ -83,14 +80,12 @@ public class GachaManager : MonoBehaviour
     // 鍵管理
     // -------------------------------------------------------
 
-    /// <summary>鍵を追加します。</summary>
     public void AddKey(int amount)
     {
         _keyCount += amount;
         Debug.Log($"[GachaManager] 鍵追加: {amount} → 残り{_keyCount}");
     }
 
-    /// <summary>鍵が足りるか確認して消費します。足りない場合はfalseを返します。</summary>
     private bool TryConsumeKey(int amount)
     {
         if (_keyCount < amount)
@@ -106,25 +101,17 @@ public class GachaManager : MonoBehaviour
     // ガチャ実行
     // -------------------------------------------------------
 
-    /// <summary>
-    /// 1回ガチャを実行します。鍵が足りない場合はnullを返します。
-    /// </summary>
     public GachaItem DrawSingle()
     {
         if (!TryConsumeKey(_singleCost)) return null;
-
         var result = Draw();
         AddToInventory(result);
         return result;
     }
 
-    /// <summary>
-    /// 10連ガチャを実行します。鍵が足りない場合はnullを返します。
-    /// </summary>
     public GachaItem[] DrawTen()
     {
         if (!TryConsumeKey(_tenCost)) return null;
-
         var results = new GachaItem[10];
         for (int i = 0; i < 10; i++)
         {
@@ -138,18 +125,12 @@ public class GachaManager : MonoBehaviour
     // 抽選ロジック
     // -------------------------------------------------------
 
-    /// <summary>
-    /// 1回分の抽選を行います。
-    /// </summary>
     private GachaItem Draw()
     {
         var tier = DrawTier();
         return DrawItemFromTier(tier);
     }
 
-    /// <summary>
-    /// レアリティを抽選します。
-    /// </summary>
     private ItemTier DrawTier()
     {
         float rand = Random.value;
@@ -158,10 +139,6 @@ public class GachaManager : MonoBehaviour
         return ItemTier.R;
     }
 
-    /// <summary>
-    /// レアリティに応じてアイテムを1つ選びます。
-    /// SSRかつPickUp選択中の場合、_pickUpRateの確率でPickUpキャラが選ばれます。
-    /// </summary>
     private GachaItem DrawItemFromTier(ItemTier tier)
     {
         switch (tier)
@@ -170,18 +147,13 @@ public class GachaManager : MonoBehaviour
                 if (_selectedPickUp != null && Random.value < _pickUpRate)
                     return _selectedPickUp;
                 return RandomFrom(_ssrItems);
-
             case ItemTier.SR:
                 return RandomFrom(_srItems);
-
             default:
                 return RandomFrom(_rItems);
         }
     }
 
-    /// <summary>
-    /// 配列からランダムに1つ選びます。
-    /// </summary>
     private GachaItem RandomFrom(GachaItem[] items)
     {
         if (items == null || items.Length == 0)
@@ -196,18 +168,13 @@ public class GachaManager : MonoBehaviour
     // 所持品管理
     // -------------------------------------------------------
 
-    /// <summary>
-    /// アイテムを所持品に追加します。
-    /// </summary>
     private void AddToInventory(GachaItem item)
     {
         if (item == null) return;
-
         if (_inventory.ContainsKey(item))
             _inventory[item]++;
         else
             _inventory[item] = 1;
-
         Debug.Log($"[GachaManager] 所持品追加: {item.DisplayName}（計{_inventory[item]}個）");
     }
 }
