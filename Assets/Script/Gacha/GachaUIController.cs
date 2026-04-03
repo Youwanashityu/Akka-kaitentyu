@@ -19,6 +19,8 @@ public class GachaUIController : MonoBehaviour
 
     [Header("PickUpボタン")]
     [SerializeField] private Button _pickUpButton;
+    [SerializeField] private Image _pickUpButtonImage;
+    [SerializeField] private Sprite _pickUpDefaultSprite;
 
     [Header("結果表示")]
     [SerializeField] private OneResultController _oneResultController;
@@ -27,11 +29,8 @@ public class GachaUIController : MonoBehaviour
     [Header("PickUp選択UI")]
     [SerializeField] private PickUpSelectController _pickUpSelectController;
 
-    // -------------------------------------------------------
-    // 内部状態
-    // -------------------------------------------------------
-
-    private CancellationTokenSource _cts;
+    [Header("鍵表示")]
+    [SerializeField] private KeyDisplayController _keyDisplayController;
 
     // -------------------------------------------------------
     // ライフサイクル
@@ -42,11 +41,8 @@ public class GachaUIController : MonoBehaviour
         _singleDrawButton.onClick.AddListener(OnSingleDrawButtonClicked);
         _tenDrawButton.onClick.AddListener(OnTenDrawButtonClicked);
         _pickUpButton.onClick.AddListener(OnPickUpButtonClicked);
-    }
 
-    private void OnDestroy()
-    {
-        _cts = _cts.Clear();
+        UpdatePickUpButtonImage();
     }
 
     // -------------------------------------------------------
@@ -65,7 +61,22 @@ public class GachaUIController : MonoBehaviour
 
     private void OnPickUpButtonClicked()
     {
-        _pickUpSelectController.Show();
+        _pickUpSelectController.Show(OnPickUpSelected);
+    }
+
+    private void OnPickUpSelected()
+    {
+        UpdatePickUpButtonImage();
+    }
+
+    // -------------------------------------------------------
+    // PickUpボタン画像更新
+    // -------------------------------------------------------
+
+    public void UpdatePickUpButtonImage()
+    {
+        var selected = GachaManager.Instance.SelectedPickUp;
+        _pickUpButtonImage.sprite = selected != null ? selected.Icon : _pickUpDefaultSprite;
     }
 
     // -------------------------------------------------------
@@ -84,6 +95,8 @@ public class GachaUIController : MonoBehaviour
             return;
         }
 
+        _keyDisplayController.UpdateDisplay();
+
         var displayInfo = new ItemDisplayInfo(item);
         await _oneResultController.ShowResult(displayInfo, token);
 
@@ -101,6 +114,8 @@ public class GachaUIController : MonoBehaviour
             SetButtonsInteractable(true);
             return;
         }
+
+        _keyDisplayController.UpdateDisplay();
 
         var displayInfos = new ItemDisplayInfo[items.Length];
         for (int i = 0; i < items.Length; i++)

@@ -1,4 +1,3 @@
-using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
@@ -14,20 +13,25 @@ public class OneResultController : MonoBehaviour
     [SerializeField] private TMP_Text displayName;
     [SerializeField] private Button closeButton;
     [SerializeField] private Button skipButton;
-    // [SerializeField] private SerializedDictionary<ItemTier, Sprite> tierItemBacks;
 
     private CancellationTokenSource _cts;
 
-    public Button SkipButton => skipButton;
+    // -------------------------------------------------------
+    // 単発用（スキップボタン非表示）
+    // -------------------------------------------------------
 
+    /// <summary>
+    /// 単発ガチャ結果を表示します。スキップボタンは非表示になります。
+    /// </summary>
     public async UniTask ShowResult(ItemDisplayInfo displayInfo, CancellationToken token)
     {
         _cts = _cts.Reset();
         var linkedToken = _cts.LinkedToken(token);
 
+        skipButton.gameObject.SetActive(false);
         gameObject.SetActive(true);
         SetDisplayInfo(displayInfo);
-        Animation();
+        PlayAnimation();
 
         try
         {
@@ -39,7 +43,47 @@ public class OneResultController : MonoBehaviour
         }
     }
 
-    private void Animation()
+    // -------------------------------------------------------
+    // 10連用（スキップボタン表示）
+    // -------------------------------------------------------
+
+    /// <summary>
+    /// 10連ガチャの1件分を表示します。スキップボタンが押されたらtrueを返します。
+    /// </summary>
+    public async UniTask<bool> ShowResultWithSkip(ItemDisplayInfo displayInfo, CancellationToken token)
+    {
+        _cts = _cts.Reset();
+        var linkedToken = _cts.LinkedToken(token);
+
+        skipButton.gameObject.SetActive(true);
+        gameObject.SetActive(true);
+        SetDisplayInfo(displayInfo);
+        PlayAnimation();
+
+        bool skipped = false;
+
+        try
+        {
+            // 閉じるボタンかスキップボタンのどちらかを待つ
+            int result = await UniTask.WhenAny(
+                closeButton.OnClickAsync(linkedToken),
+                skipButton.OnClickAsync(linkedToken)
+            );
+            skipped = result == 1; // 1ならスキップボタン
+        }
+        finally
+        {
+            gameObject.SetActive(false);
+        }
+
+        return skipped;
+    }
+
+    // -------------------------------------------------------
+    // 内部処理
+    // -------------------------------------------------------
+
+    private void PlayAnimation()
     {
         animation.DOKill();
         animation.localScale = Vector3.one * 1.15f;

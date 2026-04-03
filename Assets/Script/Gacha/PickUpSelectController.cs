@@ -1,4 +1,4 @@
-using TMPro;
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -20,6 +20,12 @@ public class PickUpSelectController : MonoBehaviour
 
     [Header("PickUp対象キャラクター（GachaManagerと同じ順番で設定）")]
     [SerializeField] private GachaItem[] _pickUpCharacters;
+
+    // -------------------------------------------------------
+    // 内部状態
+    // -------------------------------------------------------
+
+    private Action _onSelected;
 
     // -------------------------------------------------------
     // ライフサイクル
@@ -47,8 +53,10 @@ public class PickUpSelectController : MonoBehaviour
     /// <summary>
     /// PickUp選択ポップアップを表示します。
     /// </summary>
-    public void Show()
+    /// <param name="onSelected">選択またはとじるボタンが押されたときのコールバック</param>
+    public void Show(Action onSelected = null)
     {
+        _onSelected = onSelected;
         UpdateSelectionVisual();
         gameObject.SetActive(true);
     }
@@ -56,6 +64,8 @@ public class PickUpSelectController : MonoBehaviour
     private void Hide()
     {
         gameObject.SetActive(false);
+        _onSelected?.Invoke();
+        _onSelected = null;
     }
 
     // -------------------------------------------------------
@@ -66,21 +76,14 @@ public class PickUpSelectController : MonoBehaviour
     {
         // 同じキャラをもう一度押したら選択解除
         if (GachaManager.Instance.SelectedPickUp == character)
-        {
             GachaManager.Instance.SelectPickUp(null);
-        }
         else
-        {
             GachaManager.Instance.SelectPickUp(character);
-        }
 
         UpdateSelectionVisual();
         Hide();
     }
 
-    /// <summary>
-    /// 現在の選択状態に合わせてボタンの見た目を更新します。
-    /// </summary>
     private void UpdateSelectionVisual()
     {
         foreach (var button in _characterButtons)
