@@ -12,12 +12,17 @@ public class GachaItem : ScriptableObject
     [SerializeField] private Sprite _icon;
     [SerializeField] private ItemTier _tier;
 
-    /// <summary>キャラクターかどうか（SSRのみtrue）</summary>
     [Header("キャラクター設定")]
+    [Tooltip("SSRキャラクターの場合はtrueにする")]
     [SerializeField] private bool _isCharacter;
+
+    [Header("プレゼント設定")]
+    [Tooltip("このアイテムをプレゼントしたときに再生する会話のTalkID")]
+    [SerializeField] private string _presentTalkID;
 
     public string DisplayName => _displayName;
     public Sprite Icon => _icon;
     public ItemTier Tier => _tier;
     public bool IsCharacter => _isCharacter;
+    public string PresentTalkID => _presentTalkID;
 }

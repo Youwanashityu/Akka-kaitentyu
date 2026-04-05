@@ -168,6 +168,9 @@ public class GachaManager : MonoBehaviour
     // 所持品管理
     // -------------------------------------------------------
 
+    /// <summary>
+    /// アイテムを所持品に追加します。
+    /// </summary>
     private void AddToInventory(GachaItem item)
     {
         if (item == null) return;
@@ -176,5 +179,22 @@ public class GachaManager : MonoBehaviour
         else
             _inventory[item] = 1;
         Debug.Log($"[GachaManager] 所持品追加: {item.DisplayName}（計{_inventory[item]}個）");
+    }
+
+    /// <summary>
+    /// アイテムを所持品から1つ消費します。
+    /// 所持数が0になったらリストから削除します。
+    /// </summary>
+    public void ConsumeItem(GachaItem item)
+    {
+        if (item == null) return;
+        if (!_inventory.ContainsKey(item) || _inventory[item] <= 0)
+        {
+            Debug.LogWarning($"[GachaManager] 消費するアイテムがありません: {item.DisplayName}");
+            return;
+        }
+        _inventory[item]--;
+        if (_inventory[item] <= 0) _inventory.Remove(item);
+        Debug.Log($"[GachaManager] アイテム消費: {item.DisplayName}");
     }
 }
