@@ -23,35 +23,28 @@ public class HomeTalkController : MonoBehaviour
     [Header("ゲーム設定")]
     [SerializeField] private GameSettingScriptable _gameSetting;
 
-    [Header("CSVファイル名（拡張子なし）")]
-    [SerializeField] private string _like1CsvName = "Lux_Like1";
-    [SerializeField] private string _like2CsvName = "Lux_Like2";
-    [SerializeField] private string _like3CsvName = "Lux_Like3";
-    [SerializeField] private string _tutorialCsvName = "Lux_Tutorial";
+    [Header("好感度バー")]
+    [SerializeField] private LovePointBarController _lovePointBar;
+
+    [Header("エンディングポップアップ")]
+    [SerializeField] private EndingPopupController _endingPopup;
 
     // -------------------------------------------------------
     // 内部状態
     // -------------------------------------------------------
 
-    /// <summary>好感度ポイント</summary>
     private int _lovePoint = 0;
-
-    /// <summary>会話中かどうか</summary>
     private bool _isTalking = false;
-
-    /// <summary>チュートリアル済みかどうか</summary>
     private bool _tutorialDone = false;
+    private string _characterName;
 
-    /// <summary>好感度レベルごとの会話開始IDリスト</summary>
     private Dictionary<int, List<string>> _talkStartIDs = new();
-
-    /// <summary>好感度レベルごとのCSVデータ</summary>
     private Dictionary<int, Dictionary<string, TalkData>> _talkDataByLevel = new();
-
-    /// <summary>チュートリアルCSVデータ</summary>
     private Dictionary<string, TalkData> _tutorialTalkData;
 
     private CancellationTokenSource _cts;
+
+    public int LovePoint => _lovePoint;
 
     // -------------------------------------------------------
     // ライフサイクル
@@ -59,7 +52,6 @@ public class HomeTalkController : MonoBehaviour
 
     private void Start()
     {
-        LoadAllCsv();
         _characterButton.onClick.AddListener(OnCharacterTapped);
     }
 
@@ -69,30 +61,40 @@ public class HomeTalkController : MonoBehaviour
     }
 
     // -------------------------------------------------------
+    // キャラクター切り替え
+    // -------------------------------------------------------
+
+    /// <summary>
+    /// 表示キャラクターが切り替わったときに呼びます。
+    /// CSVを読み直して会話データを更新します。
+    /// </summary>
+    public void SetCharacter(string characterName)
+    {
+        _characterName = characterName;
+        _tutorialDone = false;
+        _lovePoint = 0;
+        _talkStartIDs.Clear();
+        _talkDataByLevel.Clear();
+        LoadAllCsv();
+        _lovePointBar.UpdateBar(_lovePoint);
+    }
+
+    // -------------------------------------------------------
     // CSV読み込み
     // -------------------------------------------------------
 
     private void LoadAllCsv()
     {
-        _tutorialTalkData = TalkDataLoader.Load(_tutorialCsvName);
+        _tutorialTalkData = TalkDataLoader.Load($"{_characterName}_Tutorial");
 
-        var like1Data = TalkDataLoader.Load(_like1CsvName);
-        var like2Data = TalkDataLoader.Load(_like2CsvName);
-        var like3Data = TalkDataLoader.Load(_like3CsvName);
-
-        _talkDataByLevel[1] = like1Data;
-        _talkDataByLevel[2] = like2Data;
-        _talkDataByLevel[3] = like3Data;
-
-        // 各レベルの会話開始IDを収集（NextOnA/Bで参照されないIDが開始ID）
-        _talkStartIDs[1] = GetStartIDs(like1Data);
-        _talkStartIDs[2] = GetStartIDs(like2Data);
-        _talkStartIDs[3] = GetStartIDs(like3Data);
+        for (int level = 1; level <= 3; level++)
+        {
+            var data = TalkDataLoader.Load($"{_characterName}_Like{level}");
+            _talkDataByLevel[level] = data;
+            _talkStartIDs[level] = GetStartIDs(data);
+        }
     }
 
-    /// <summary>
-    /// 他の会話から参照されていないIDを開始IDとして返します。
-    /// </summary>
     private List<string> GetStartIDs(Dictionary<string, TalkData> data)
     {
         var referencedIDs = new HashSet<string>();
@@ -131,14 +133,12 @@ public class HomeTalkController : MonoBehaviour
 
         if (!_tutorialDone)
         {
-            // チュートリアル会話
             _tutorialDone = true;
             talkData = _tutorialTalkData;
             startID = GetTutorialStartID();
         }
         else
         {
-            // 好感度に応じたランダム会話
             var level = _gameSetting.GetLikeLevel(_lovePoint);
             talkData = _talkDataByLevel[level];
             startID = GetRandomStartID(level);
@@ -154,7 +154,6 @@ public class HomeTalkController : MonoBehaviour
         _talkPlayer.Setup(talkData);
         await _talkPlayer.Play(startID, token);
 
-        // 会話後に好感度を加算
         AddLovePoint(_gameSetting.TalkLoveAmount);
 
         _isTalking = false;
@@ -167,7 +166,6 @@ public class HomeTalkController : MonoBehaviour
     private string GetTutorialStartID()
     {
         if (_tutorialTalkData == null || _tutorialTalkData.Count == 0) return null;
-        // チュートリアルは最初のIDから開始
         foreach (var id in _tutorialTalkData.Keys) return id;
         return null;
     }
@@ -183,13 +181,18 @@ public class HomeTalkController : MonoBehaviour
     // -------------------------------------------------------
 
     /// <summary>
-    /// 好感度を加算します。
+    /// 好感度を加算してバーを更新します。MAXに達したらエンディングを表示します。
     /// </summary>
     public void AddLovePoint(int amount)
     {
         _lovePoint += amount;
-        Debug.Log($"[HomeTalkController] 好感度: {_lovePoint}（Lv{_gameSetting.GetLikeLevel(_lovePoint)}）");
-    }
+        _lovePointBar.UpdateBar(_lovePoint);
 
-    public int LovePoint => _lovePoint;
+        Debug.Log($"[HomeTalkController] 好感度: {_lovePoint}（Lv{_gameSetting.GetLikeLevel(_lovePoint)}）");
+
+        if (_gameSetting.IsMax(_lovePoint))
+        {
+            _endingPopup.Show();
+        }
+    }
 }

@@ -3,7 +3,7 @@ using Cysharp.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.UIElements;
+
 
 /// <summary>
 /// ホーム画面の会話UIを管理するコントローラー。

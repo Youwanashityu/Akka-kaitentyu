@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 /// <summary>
 /// ゲーム全体の共通設定をまとめたScriptableObject。
@@ -18,7 +17,10 @@ public class GameSettingScriptable : ScriptableObject
     [SerializeField] private int _like2Threshold = 100;
 
     [Tooltip("この値以上でLike3になる")]
-    [SerializeField] private int _like3Threshold = 200;
+    [SerializeField] private int _like3Threshold = 300;
+
+    [Tooltip("この値以上でMAX（Like4）になる＝エンディング")]
+    [SerializeField] private int _like4Threshold = 600;
 
     [Header("会話の好感度上昇量")]
     [Tooltip("会話1回あたりの好感度上昇量")]
@@ -38,6 +40,7 @@ public class GameSettingScriptable : ScriptableObject
 
     public int Like2Threshold => _like2Threshold;
     public int Like3Threshold => _like3Threshold;
+    public int Like4Threshold => _like4Threshold;
     public int TalkLoveAmount => _talkLoveAmount;
 
     // -------------------------------------------------------
@@ -46,6 +49,7 @@ public class GameSettingScriptable : ScriptableObject
 
     /// <summary>
     /// 好感度の値からLikeレベル（1〜3）を返します。
+    /// MAXに達している場合は3を返します。
     /// </summary>
     public int GetLikeLevel(int lovePoint)
     {
@@ -53,6 +57,11 @@ public class GameSettingScriptable : ScriptableObject
         if (lovePoint >= _like2Threshold) return 2;
         return 1;
     }
+
+    /// <summary>
+    /// MAXに達しているか返します。
+    /// </summary>
+    public bool IsMax(int lovePoint) => lovePoint >= _like4Threshold;
 
     /// <summary>
     /// 指定したGachaItemをプレゼントしたときの好感度上昇量を返します。
