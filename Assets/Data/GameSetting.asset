@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 04480237046fb4b4798d998aea2591e0, type: 3}
+  m_Name: GameSetting
+  m_EditorClassIdentifier: 
+  _like2Threshold: 100
+  _like3Threshold: 200
+  _like4Threshold: 400
+  _talkLoveAmount: 10
+  _presentSettings:
+  - _item: {fileID: 11400000, guid: 0d261bf34825d2c448fc37c875e9da07, type: 2}
+    _loveAmount: 100

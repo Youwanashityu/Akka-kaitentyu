@@ -4,7 +4,8 @@ using UnityEngine.UI;
 
 /// <summary>
 /// 好感度バーの表示を管理するコントローラー。
-/// 好感度レベルの範囲内での進捗をバーに反映します。
+/// Imageコンポーネントを使ってバーの長さを制御します。
+/// FillImageのImageTypeをFilled・FillMethodをHorizontalに設定してください。
 /// </summary>
 public class LovePointBarController : MonoBehaviour
 {
@@ -13,7 +14,8 @@ public class LovePointBarController : MonoBehaviour
     // -------------------------------------------------------
 
     [Header("UI")]
-    [SerializeField] private Slider _bar;
+    [Tooltip("ImageType:Filled、FillMethod:Horizontalに設定したImage")]
+    [SerializeField] private Image _fillImage;
     [SerializeField] private TMP_Text _levelText;
 
     [Header("ゲーム設定")]
@@ -31,10 +33,7 @@ public class LovePointBarController : MonoBehaviour
         var level = _gameSetting.GetLikeLevel(lovePoint);
         var (min, max) = GetLevelRange(level);
 
-        _bar.minValue = 0f;
-        _bar.maxValue = 1f;
-        _bar.value = Mathf.InverseLerp(min, max, lovePoint);
-
+        _fillImage.fillAmount = Mathf.InverseLerp(min, max, lovePoint);
         _levelText.text = $"Lv.{level}";
     }
 

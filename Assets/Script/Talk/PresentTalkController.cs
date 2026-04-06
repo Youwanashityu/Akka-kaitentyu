@@ -6,6 +6,7 @@ using UnityEngine.UI;
 
 /// <summary>
 /// プレゼントボタンの制御とアイテムに対応した会話の呼び出しを担うコントローラー。
+/// アイテムごとに初回と2回目以降で会話を切り替えます。
 /// </summary>
 public class PresentTalkController : MonoBehaviour
 {
@@ -35,6 +36,9 @@ public class PresentTalkController : MonoBehaviour
 
     private Dictionary<string, TalkData> _presentTalkData;
     private bool _isTalking = false;
+
+    /// <summary>既にプレゼントしたことがあるアイテムの記録</summary>
+    private readonly HashSet<GachaItem> _presentedItems = new();
 
     // -------------------------------------------------------
     // ライフサイクル
@@ -72,8 +76,19 @@ public class PresentTalkController : MonoBehaviour
         // インベントリからアイテムを1つ消費
         GachaManager.Instance.ConsumeItem(item);
 
-        // GachaItemに設定されたTalkIDで会話を引く
-        var startID = item.PresentTalkID;
+        // 初回か2回目以降かでTalkIDを切り替え
+        string startID;
+        bool isAgain = _presentedItems.Contains(item);
+
+        if (isAgain && !string.IsNullOrEmpty(item.PresentTalkIDAgain))
+        {
+            startID = item.PresentTalkIDAgain;
+        }
+        else
+        {
+            startID = item.PresentTalkID;
+            _presentedItems.Add(item);
+        }
 
         if (string.IsNullOrEmpty(startID) || !_presentTalkData.ContainsKey(startID))
         {

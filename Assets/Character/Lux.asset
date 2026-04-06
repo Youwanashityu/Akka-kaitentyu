@@ -1,0 +1,56 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d5a7cc8a04637742ba098dd9cf1aa6c, type: 3}
+  m_Name: Lux
+  m_EditorClassIdentifier: 
+  _characterName: Lux
+  _gachaItem: {fileID: 11400000, guid: 4b29323cac565d744a894a2c617762c6, type: 2}
+  _defaultSprite: {fileID: 21300000, guid: 7a4140f9c01762e418df62d04e582e57, type: 3}
+  _miniDefaultSprite: {fileID: 21300000, guid: 7a4140f9c01762e418df62d04e582e57, type: 3}
+  _images:
+  - ImageTypeName: R_down_exciting
+    Sprite: {fileID: 21300000, guid: c4918de24a59b1040b13415d27a4ef09, type: 3}
+  - ImageTypeName: R_down_komaru
+    Sprite: {fileID: 21300000, guid: fe25408dbfd33d14e8f5db692cdf27c3, type: 3}
+  - ImageTypeName: R_down_nomal_close
+    Sprite: {fileID: 21300000, guid: ef07d867eadb58e4aaecf661528cb90a, type: 3}
+  - ImageTypeName: R_down_nomal_open
+    Sprite: {fileID: 21300000, guid: 925c2c2fc61fb504fb4d56cbb4226be0, type: 3}
+  - ImageTypeName: R_down_poke
+    Sprite: {fileID: 21300000, guid: 7a4140f9c01762e418df62d04e582e57, type: 3}
+  - ImageTypeName: R_down_shy
+    Sprite: {fileID: 21300000, guid: dd30acc26dc48d34dbc974da1701f710, type: 3}
+  - ImageTypeName: R_down_smile_close
+    Sprite: {fileID: 21300000, guid: 834726449acb9904fa6e5049d453b90b, type: 3}
+  - ImageTypeName: R_down_smile_open
+    Sprite: {fileID: 21300000, guid: f2b25fae7129f4b4db73d80ae75146d2, type: 3}
+  _voices:
+  - VoiceTypeName: Oh
+    Clip: {fileID: 8300000, guid: 7c0b21bae22bff44aad64df27cbb7a5f, type: 3}
+  - VoiceTypeName: Hello
+    Clip: {fileID: 8300000, guid: b0c5867bd67b3bd4e847888170e7b22d, type: 3}
+  - VoiceTypeName: Wrongperson
+    Clip: {fileID: 8300000, guid: f7714d2bdc696b8409eb8f6cf1ccd887, type: 3}
+  - VoiceTypeName: Zero
+    Clip: {fileID: 8300000, guid: a29d0040c7d856341a20e24507e78de6, type: 3}
+  - VoiceTypeName: Guilty
+    Clip: {fileID: 8300000, guid: 2219fd423e15289419a788e6f110df6d, type: 3}
+  - VoiceTypeName: Innocence
+    Clip: {fileID: 8300000, guid: 76945db12987a364bb3ed87506adacae, type: 3}
+  - VoiceTypeName: Sleepatnight
+    Clip: {fileID: 8300000, guid: b48d52988f2a34c4d81ae273416ad6b7, type: 3}
+  - VoiceTypeName: Cute
+    Clip: {fileID: 8300000, guid: ff4bcdc83fb41924db1cf1955492d34f, type: 3}
+  - VoiceTypeName: Onlythistime
+    Clip: {fileID: 8300000, guid: a82e6b084eb1f7e48b0a7e32ba6d691d, type: 3}
+  - VoiceTypeName: Onlythistime
+    Clip: {fileID: 8300000, guid: a82e6b084eb1f7e48b0a7e32ba6d691d, type: 3}

@@ -7,6 +7,7 @@ using UnityEngine.UI;
 /// <summary>
 /// ホーム画面のキャラクタータップによる会話を管理するコントローラー。
 /// 好感度レベルに応じてランダムに会話を選択してTalkPlayerに渡します。
+/// チュートリアルは初回と2回目以降で会話を切り替えます。
 /// </summary>
 public class HomeTalkController : MonoBehaviour
 {
@@ -28,6 +29,9 @@ public class HomeTalkController : MonoBehaviour
 
     [Header("エンディングポップアップ")]
     [SerializeField] private EndingPopupController _endingPopup;
+
+    [Header("チュートリアル2回目以降の開始TalkID")]
+    [SerializeField] private string _tutorialAgainStartID = "TutorialAgain";
 
     // -------------------------------------------------------
     // 内部状態
@@ -52,6 +56,8 @@ public class HomeTalkController : MonoBehaviour
 
     private void Start()
     {
+        Debug.Log("[HomeTalkController] Start呼ばれました");
+        Debug.Log($"[HomeTalkController] ボタン: {_characterButton?.name}");
         _characterButton.onClick.AddListener(OnCharacterTapped);
     }
 
@@ -120,6 +126,7 @@ public class HomeTalkController : MonoBehaviour
 
     private void OnCharacterTapped()
     {
+        Debug.Log("[HomeTalkController] タップされました！");
         if (_isTalking) return;
         TalkAsync(this.GetCancellationTokenOnDestroy()).Forget();
     }
@@ -133,12 +140,30 @@ public class HomeTalkController : MonoBehaviour
 
         if (!_tutorialDone)
         {
+            // 初回チュートリアル
             _tutorialDone = true;
             talkData = _tutorialTalkData;
             startID = GetTutorialStartID();
         }
+        else if (_tutorialTalkData.ContainsKey(_tutorialAgainStartID))
+        {
+            // チュートリアルキャラの2回目以降はTutorialAgainから
+            // ただし好感度会話がある場合はそちらを優先
+            var level = _gameSetting.GetLikeLevel(_lovePoint);
+            if (_talkStartIDs.TryGetValue(level, out var ids) && ids.Count > 0)
+            {
+                talkData = _talkDataByLevel[level];
+                startID = GetRandomStartID(level);
+            }
+            else
+            {
+                talkData = _tutorialTalkData;
+                startID = _tutorialAgainStartID;
+            }
+        }
         else
         {
+            // 好感度に応じたランダム会話
             var level = _gameSetting.GetLikeLevel(_lovePoint);
             talkData = _talkDataByLevel[level];
             startID = GetRandomStartID(level);

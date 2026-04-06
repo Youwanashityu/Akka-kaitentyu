@@ -20,9 +20,13 @@ public class GachaItem : ScriptableObject
     [Tooltip("このアイテムをプレゼントしたときに再生する会話のTalkID")]
     [SerializeField] private string _presentTalkID;
 
+    [Tooltip("2回目以降にプレゼントしたときに再生する会話のTalkID（nullなら毎回同じ会話）")]
+    [SerializeField] private string _presentTalkIDAgain;
+
     public string DisplayName => _displayName;
     public Sprite Icon => _icon;
     public ItemTier Tier => _tier;
     public bool IsCharacter => _isCharacter;
     public string PresentTalkID => _presentTalkID;
+    public string PresentTalkIDAgain => _presentTalkIDAgain;
 }

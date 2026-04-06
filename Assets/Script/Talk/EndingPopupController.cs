@@ -1,11 +1,10 @@
 using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 /// <summary>
 /// 好感度がMAXになったときに表示するエンディングポップアップ。
-/// タイトルに戻るボタンとゲームを続けるボタンを表示します。
+/// 閉じるボタンでポップアップを消してゲームを続けられます。
 /// </summary>
 public class EndingPopupController : MonoBehaviour
 {
@@ -15,11 +14,7 @@ public class EndingPopupController : MonoBehaviour
 
     [Header("UI")]
     [SerializeField] private TMP_Text _messageText;
-    [SerializeField] private Button _backToTitleButton;
-    [SerializeField] private Button _continueButton;
-
-    [Header("タイトルシーン名")]
-    [SerializeField] private string _titleSceneName = "Title";
+    [SerializeField] private Button _closeButton;
 
     [Header("エンディングメッセージ")]
     [TextArea]
@@ -31,8 +26,7 @@ public class EndingPopupController : MonoBehaviour
 
     private void Start()
     {
-        _backToTitleButton.onClick.AddListener(OnBackToTitleClicked);
-        _continueButton.onClick.AddListener(OnContinueClicked);
+        _closeButton.onClick.AddListener(Hide);
         _messageText.text = _endingMessage;
         gameObject.SetActive(false);
     }
@@ -52,19 +46,5 @@ public class EndingPopupController : MonoBehaviour
     private void Hide()
     {
         gameObject.SetActive(false);
-    }
-
-    // -------------------------------------------------------
-    // ボタンイベント
-    // -------------------------------------------------------
-
-    private void OnBackToTitleClicked()
-    {
-        SceneManager.LoadScene(_titleSceneName);
-    }
-
-    private void OnContinueClicked()
-    {
-        Hide();
     }
 }
