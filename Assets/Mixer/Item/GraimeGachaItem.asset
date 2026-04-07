@@ -13,7 +13,9 @@ MonoBehaviour:
   m_Name: GraimeGachaItem
   m_EditorClassIdentifier: 
   _displayName: "\u30B0\u30EC\u30A4\u30E0"
-  _icon: {fileID: 21300000, guid: 0d1d1484925a7344aaeaf2dd1680673f, type: 3}
+  _icon: {fileID: -7101319624193431600, guid: 550ba4fc949f1dc44ab11c25500310f9, type: 3}
   _tier: 2
   _isCharacter: 1
+  _pickUpIcon: {fileID: -3072366685499050482, guid: 95b3967012ffb2b4eb35dca218c7a9fe, type: 3}
   _presentTalkID: 
+  _presentTalkIDAgain: 

@@ -13,6 +13,9 @@ MonoBehaviour:
   m_Name: LuxGachaItem
   m_EditorClassIdentifier: 
   _displayName: "\u30EB\u30AF\u30B9"
-  _icon: {fileID: 21300000, guid: 7a4140f9c01762e418df62d04e582e57, type: 3}
+  _icon: {fileID: 3064676313817651956, guid: e50f9822cf8ed804992ce30164a6b02a, type: 3}
   _tier: 2
   _isCharacter: 1
+  _pickUpIcon: {fileID: 9203546406458533030, guid: 6bb8062b638f9c545a2e3b164f9f3004, type: 3}
+  _presentTalkID: 
+  _presentTalkIDAgain: 

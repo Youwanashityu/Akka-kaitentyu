@@ -55,6 +55,27 @@ MonoBehaviour:
   - name: down
     clip: {fileID: 8300000, guid: 12a71b299e31c874990cf41623383c4d, type: 3}
     volume: 1
+  - name: gacya_start
+    clip: {fileID: 8300000, guid: c8bbab01f08cf4347b93f7fd8ece21bf, type: 3}
+    volume: 1
+  - name: gacya_single_N
+    clip: {fileID: 8300000, guid: 5f5e8108ebb1cff4a804740bf21ada6e, type: 3}
+    volume: 1
+  - name: gacya_single_SR
+    clip: {fileID: 8300000, guid: 5b5994073176a29419172d2f57e38c7c, type: 3}
+    volume: 1
+  - name: gacya_single_SR
+    clip: {fileID: 8300000, guid: 5b5994073176a29419172d2f57e38c7c, type: 3}
+    volume: 1
+  - name: likeability_up
+    clip: {fileID: 8300000, guid: 0abff11ebf1db7943b0393821e125d8d, type: 3}
+    volume: 1
+  - name: ikeability_up
+    clip: {fileID: 8300000, guid: 0abff11ebf1db7943b0393821e125d8d, type: 3}
+    volume: 1
+  - name: click_decision
+    clip: {fileID: 8300000, guid: 11630aaccc3890f4ca500e4900ebb29f, type: 3}
+    volume: 1
   vcList:
   - name: ikareru
     clip: {fileID: 8300000, guid: e21bd231dd370934fa848e6b2b2d8e69, type: 3}

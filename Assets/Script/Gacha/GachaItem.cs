@@ -16,6 +16,10 @@ public class GachaItem : ScriptableObject
     [Tooltip("SSRキャラクターの場合はtrueにする")]
     [SerializeField] private bool _isCharacter;
 
+    [Header("PickUp設定")]
+    [Tooltip("PickUpボタンに表示するアイコン。未設定の場合はIconを使用します。")]
+    [SerializeField] private Sprite _pickUpIcon;
+
     [Header("プレゼント設定")]
     [Tooltip("このアイテムをプレゼントしたときに再生する会話のTalkID")]
     [SerializeField] private string _presentTalkID;
@@ -27,6 +31,8 @@ public class GachaItem : ScriptableObject
     public Sprite Icon => _icon;
     public ItemTier Tier => _tier;
     public bool IsCharacter => _isCharacter;
+    /// <summary>PickUpボタン用アイコン。未設定の場合はIconを返します。</summary>
+    public Sprite PickUpIcon => _pickUpIcon != null ? _pickUpIcon : _icon;
     public string PresentTalkID => _presentTalkID;
     public string PresentTalkIDAgain => _presentTalkIDAgain;
 }

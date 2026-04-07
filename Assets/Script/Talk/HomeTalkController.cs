@@ -6,8 +6,7 @@ using UnityEngine.UI;
 
 /// <summary>
 /// ホーム画面のキャラクタータップによる会話を管理するコントローラー。
-/// 好感度レベルに応じてランダムに会話を選択してTalkPlayerに渡します。
-/// チュートリアルは初回と2回目以降で会話を切り替えます。
+/// チュートリアルキャラとガチャキャラで会話の分岐を切り替えます。
 /// </summary>
 public class HomeTalkController : MonoBehaviour
 {
@@ -37,10 +36,15 @@ public class HomeTalkController : MonoBehaviour
     // 内部状態
     // -------------------------------------------------------
 
-    private int _lovePoint = 0;
     private bool _isTalking = false;
-    private bool _tutorialDone = false;
     private string _characterName;
+    private bool _isTutorialCharacter;
+
+    /// <summary>会話中かどうかを外部から参照できます。</summary>
+    public bool IsTalking => _isTalking;
+
+    /// <summary>キャラクターごとのエンディング表示済みフラグ</summary>
+    private readonly HashSet<string> _endingShownCharacters = new();
 
     private Dictionary<int, List<string>> _talkStartIDs = new();
     private Dictionary<int, Dictionary<string, TalkData>> _talkDataByLevel = new();
@@ -48,16 +52,12 @@ public class HomeTalkController : MonoBehaviour
 
     private CancellationTokenSource _cts;
 
-    public int LovePoint => _lovePoint;
-
     // -------------------------------------------------------
     // ライフサイクル
     // -------------------------------------------------------
 
     private void Start()
     {
-        Debug.Log("[HomeTalkController] Start呼ばれました");
-        Debug.Log($"[HomeTalkController] ボタン: {_characterButton?.name}");
         _characterButton.onClick.AddListener(OnCharacterTapped);
     }
 
@@ -70,19 +70,14 @@ public class HomeTalkController : MonoBehaviour
     // キャラクター切り替え
     // -------------------------------------------------------
 
-    /// <summary>
-    /// 表示キャラクターが切り替わったときに呼びます。
-    /// CSVを読み直して会話データを更新します。
-    /// </summary>
-    public void SetCharacter(string characterName)
+    public void SetCharacter(string characterName, bool isTutorialCharacter)
     {
         _characterName = characterName;
-        _tutorialDone = false;
-        _lovePoint = 0;
+        _isTutorialCharacter = isTutorialCharacter;
         _talkStartIDs.Clear();
         _talkDataByLevel.Clear();
         LoadAllCsv();
-        _lovePointBar.UpdateBar(_lovePoint);
+        _lovePointBar.UpdateBar(LoveManager.Instance.GetLovePoint(_characterName));
     }
 
     // -------------------------------------------------------
@@ -126,7 +121,6 @@ public class HomeTalkController : MonoBehaviour
 
     private void OnCharacterTapped()
     {
-        Debug.Log("[HomeTalkController] タップされました！");
         if (_isTalking) return;
         TalkAsync(this.GetCancellationTokenOnDestroy()).Forget();
     }
@@ -138,22 +132,16 @@ public class HomeTalkController : MonoBehaviour
         string startID;
         Dictionary<string, TalkData> talkData;
 
-        if (!_tutorialDone)
+        var lovePoint = LoveManager.Instance.GetLovePoint(_characterName);
+        var tutorialDone = LoveManager.Instance.IsTutorialDone(_characterName);
+
+        if (_isTutorialCharacter)
         {
-            // 初回チュートリアル
-            _tutorialDone = true;
-            talkData = _tutorialTalkData;
-            startID = GetTutorialStartID();
-        }
-        else if (_tutorialTalkData.ContainsKey(_tutorialAgainStartID))
-        {
-            // チュートリアルキャラの2回目以降はTutorialAgainから
-            // ただし好感度会話がある場合はそちらを優先
-            var level = _gameSetting.GetLikeLevel(_lovePoint);
-            if (_talkStartIDs.TryGetValue(level, out var ids) && ids.Count > 0)
+            if (!tutorialDone)
             {
-                talkData = _talkDataByLevel[level];
-                startID = GetRandomStartID(level);
+                LoveManager.Instance.SetTutorialDone(_characterName);
+                talkData = _tutorialTalkData;
+                startID = GetTutorialStartID();
             }
             else
             {
@@ -163,8 +151,7 @@ public class HomeTalkController : MonoBehaviour
         }
         else
         {
-            // 好感度に応じたランダム会話
-            var level = _gameSetting.GetLikeLevel(_lovePoint);
+            var level = _gameSetting.GetLikeLevel(lovePoint);
             talkData = _talkDataByLevel[level];
             startID = GetRandomStartID(level);
         }
@@ -205,18 +192,16 @@ public class HomeTalkController : MonoBehaviour
     // 好感度管理
     // -------------------------------------------------------
 
-    /// <summary>
-    /// 好感度を加算してバーを更新します。MAXに達したらエンディングを表示します。
-    /// </summary>
     public void AddLovePoint(int amount)
     {
-        _lovePoint += amount;
-        _lovePointBar.UpdateBar(_lovePoint);
+        LoveManager.Instance.AddLovePoint(_characterName, amount);
+        var lovePoint = LoveManager.Instance.GetLovePoint(_characterName);
+        _lovePointBar.UpdateBar(lovePoint);
 
-        Debug.Log($"[HomeTalkController] 好感度: {_lovePoint}（Lv{_gameSetting.GetLikeLevel(_lovePoint)}）");
-
-        if (_gameSetting.IsMax(_lovePoint))
+        // エンディングは1キャラにつき1回だけ表示
+        if (_gameSetting.IsMax(lovePoint) && !_endingShownCharacters.Contains(_characterName))
         {
+            _endingShownCharacters.Add(_characterName);
             _endingPopup.Show();
         }
     }

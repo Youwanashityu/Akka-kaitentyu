@@ -10,15 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4d5a7cc8a04637742ba098dd9cf1aa6c, type: 3}
-  m_Name: TutorialLux
+  m_Name: TutorialGraim
   m_EditorClassIdentifier: 
-  _characterName: Lux
+  _characterName: Graim
   _gachaItem: {fileID: 0}
   _isTutorialCharacter: 1
-  _defaultSprite: {fileID: 21300000, guid: e7bc636ee7014484fa1b93beb9c52b4e, type: 3}
-  _miniDefaultSprite: {fileID: 21300000, guid: e7bc636ee7014484fa1b93beb9c52b4e, type: 3}
-  _selectIconSprite: {fileID: 21300000, guid: e7bc636ee7014484fa1b93beb9c52b4e, type: 3}
+  _defaultSprite: {fileID: 21300000, guid: 3c45cbb96526236408a7c9a2b97cf73d, type: 3}
+  _miniDefaultSprite: {fileID: 21300000, guid: 3c45cbb96526236408a7c9a2b97cf73d, type: 3}
+  _selectIconSprite: {fileID: 21300000, guid: 3c45cbb96526236408a7c9a2b97cf73d, type: 3}
   _images:
   - ImageTypeName: Mini_Holo
-    Sprite: {fileID: 21300000, guid: e7bc636ee7014484fa1b93beb9c52b4e, type: 3}
+    Sprite: {fileID: 21300000, guid: 3c45cbb96526236408a7c9a2b97cf73d, type: 3}
   _voices: []

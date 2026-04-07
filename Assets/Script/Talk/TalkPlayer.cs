@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 /// <summary>
 /// TalkDataを受け取ってテキスト表示・画像切り替え・ボイス再生・選択肢表示を行います。
@@ -16,6 +15,10 @@ public class TalkPlayer : MonoBehaviour
     [SerializeField] private TalkController _talkController;
     [SerializeField] private CharacterSoundPlayer _soundPlayer;
 
+    [Header("SE名")]
+    [SerializeField] private string _clickSEName = "SE_click";
+    [SerializeField] private string _endSEName = "SE_likeability_up";
+
     // -------------------------------------------------------
     // 内部状態
     // -------------------------------------------------------
@@ -27,9 +30,6 @@ public class TalkPlayer : MonoBehaviour
     // 初期化
     // -------------------------------------------------------
 
-    /// <summary>
-    /// 会話データをセットします。
-    /// </summary>
     public void Setup(Dictionary<string, TalkData> talkDataDict)
     {
         _talkDataDict = talkDataDict;
@@ -40,9 +40,6 @@ public class TalkPlayer : MonoBehaviour
     // 会話再生
     // -------------------------------------------------------
 
-    /// <summary>
-    /// 指定したTalkIDから会話を開始します。
-    /// </summary>
     public async UniTask Play(string startTalkID, CancellationToken token)
     {
         _talkController.TalkBox.SetActive(true);
@@ -80,29 +77,43 @@ public class TalkPlayer : MonoBehaviour
 
                 if (selection == SelectionType.Alpha)
                 {
-                    // 選択肢Aのボイス再生
                     if (!string.IsNullOrEmpty(data.VoiceOnA))
                         _soundPlayer.PlayVoice(data.VoiceOnA);
-
                     currentID = data.NextOnA;
                 }
                 else
                 {
-                    // 選択肢Bのボイス再生
                     if (!string.IsNullOrEmpty(data.VoiceOnB))
                         _soundPlayer.PlayVoice(data.VoiceOnB);
-
                     currentID = data.NextOnB;
                 }
             }
             else
             {
-                // 選択肢なし：タップで次へ
+                // タップSEを鳴らしてから次へ
                 await _talkController.CharaTalkButton.OnClickAsync(token);
+                PlaySE(_clickSEName);
                 currentID = data.NextOnA;
             }
         }
 
+        // 会話終了SE
+        PlaySE(_endSEName);
+
         _talkController.TalkBox.SetActive(false);
+    }
+
+    // -------------------------------------------------------
+    // SE再生
+    // -------------------------------------------------------
+
+    private void PlaySE(string seName)
+    {
+        if (SoundManager.Instance == null)
+        {
+            Debug.LogWarning("[TalkPlayer] SoundManager が見つかりません。");
+            return;
+        }
+        SoundManager.Instance.PlaySE(seName);
     }
 }

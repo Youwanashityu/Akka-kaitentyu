@@ -18,6 +18,7 @@ public class HomeCharacterController : MonoBehaviour
 
     [Header("会話・サウンド")]
     [SerializeField] private HomeTalkController _homeTalkController;
+    [SerializeField] private PresentTalkController _presentTalkController;
     [SerializeField] private CharacterSoundPlayer _characterSoundPlayer;
     [SerializeField] private TalkController _talkController;
 
@@ -37,8 +38,6 @@ public class HomeCharacterController : MonoBehaviour
     private void Start()
     {
         _characterSwitchButton.onClick.AddListener(OnCharacterSwitchButtonClicked);
-
-        // 初期キャラクターを設定
         SetCharacter(_initialCharacter);
     }
 
@@ -48,6 +47,8 @@ public class HomeCharacterController : MonoBehaviour
 
     private void OnCharacterSwitchButtonClicked()
     {
+        // 会話中はキャラ切り替えをブロック
+        if (_homeTalkController.IsTalking) return;
         _selectPopup.Show(_currentCharacter, OnCharacterSelected);
     }
 
@@ -60,26 +61,23 @@ public class HomeCharacterController : MonoBehaviour
     // キャラクター切り替え
     // -------------------------------------------------------
 
-    /// <summary>
-    /// ホーム画面に表示するキャラクターを切り替えます。
-    /// </summary>
     private void SetCharacter(CharacterScriptable character)
     {
         if (character == null) return;
+        Debug.Log($"[HomeCharacterController] SetCharacter: {character.CharacterName} DefaultSprite: {character.DefaultSprite?.name}");
+
 
         _currentCharacter = character;
 
-        // 画像・ボイス辞書を更新
         _characterSoundPlayer.Setup(
             character.GetImageDict(),
             character.GetVoiceDict()
         );
 
-        // デフォルト画像をセット
         _talkController.Initialize(character.DefaultSprite, character.MiniDefaultSprite);
 
-        // CSVファイル名をキャラクター名で更新
-        _homeTalkController.SetCharacter(character.CharacterName);
+        _homeTalkController.SetCharacter(character.CharacterName, character.IsTutorialCharacter);
+        _presentTalkController.SetCharacter(character.CharacterName);
 
         Debug.Log($"[HomeCharacterController] キャラクター切り替え: {character.CharacterName}");
     }

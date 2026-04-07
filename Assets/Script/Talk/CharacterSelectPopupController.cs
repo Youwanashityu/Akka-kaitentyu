@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 /// <summary>
 /// キャラ切り替えポップアップのUIを管理するコントローラー。
-/// チュートリアルキャラ＋所持SSRキャラの一覧を表示して選択を受け付けます。
+/// 表示中はキャラクタータップボタンを無効化します。
 /// </summary>
 public class CharacterSelectPopupController : MonoBehaviour
 {
@@ -24,6 +24,9 @@ public class CharacterSelectPopupController : MonoBehaviour
     [Header("ガチャキャラクター（全SSRキャラ）")]
     [SerializeField] private CharacterScriptable[] _gachaCharacters;
 
+    [Header("ポップアップ表示中に無効化するボタン")]
+    [SerializeField] private Button _characterTapButton;
+
     // -------------------------------------------------------
     // 内部状態
     // -------------------------------------------------------
@@ -38,7 +41,7 @@ public class CharacterSelectPopupController : MonoBehaviour
 
     private void Start()
     {
-        _closeButton.onClick.AddListener(Hide);
+        _closeButton.onClick.AddListener(OnCloseButtonClicked);
         gameObject.SetActive(false);
     }
 
@@ -46,20 +49,28 @@ public class CharacterSelectPopupController : MonoBehaviour
     // 表示制御
     // -------------------------------------------------------
 
-    /// <summary>
-    /// キャラ選択ポップアップを表示します。
-    /// </summary>
     public void Show(CharacterScriptable currentSelected, Action<CharacterScriptable> onSelected)
     {
         _onSelected = onSelected;
         _currentSelected = currentSelected;
         RefreshButtonList();
         gameObject.SetActive(true);
+
+        if (_characterTapButton != null)
+            _characterTapButton.interactable = false;
     }
 
     private void Hide()
     {
         gameObject.SetActive(false);
+
+        if (_characterTapButton != null)
+            _characterTapButton.interactable = true;
+    }
+
+    private void OnCloseButtonClicked()
+    {
+        Hide();
     }
 
     // -------------------------------------------------------
@@ -72,13 +83,9 @@ public class CharacterSelectPopupController : MonoBehaviour
             Destroy(btn.gameObject);
         _buttons.Clear();
 
-        // チュートリアルキャラは常に表示
         foreach (var chara in _tutorialCharacters)
-        {
             AddButton(chara);
-        }
 
-        // ガチャキャラは所持しているものだけ表示
         foreach (var chara in _gachaCharacters)
         {
             if (chara.GachaItem == null) continue;
@@ -95,9 +102,6 @@ public class CharacterSelectPopupController : MonoBehaviour
         _buttons.Add(btn);
     }
 
-    /// <summary>
-    /// GachaManagerのインベントリにSSRキャラが入っているか確認します。
-    /// </summary>
     private bool IsOwned(GachaItem item)
     {
         return GachaManager.Instance.Inventory.ContainsKey(item);
@@ -113,13 +117,12 @@ public class CharacterSelectPopupController : MonoBehaviour
         UpdateSelectionVisual();
         Hide();
         _onSelected?.Invoke(character);
+        _onSelected = null;
     }
 
     private void UpdateSelectionVisual()
     {
         foreach (var btn in _buttons)
-        {
             btn.SetSelected(btn.Character == _currentSelected);
-        }
     }
 }

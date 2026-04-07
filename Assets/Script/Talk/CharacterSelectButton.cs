@@ -31,20 +31,22 @@ public class CharacterSelectButton : MonoBehaviour
     // セットアップ
     // -------------------------------------------------------
 
-    /// <summary>
-    /// キャラクターデータとコールバックをセットします。
-    /// </summary>
     public void Setup(CharacterScriptable character, Action<CharacterScriptable> onSelected)
     {
         Character = character;
-        _icon.sprite = character.DefaultSprite;
+        _icon.sprite = character.SelectIconSprite;
         _nameText.text = character.CharacterName;
-        _button.onClick.AddListener(() => onSelected(character));
+
+        _button.onClick.RemoveAllListeners();
+        _button.onClick.AddListener(() =>
+        {
+            Debug.Log($"[CharacterSelectButton] ボタン押された: {character.CharacterName}");
+            onSelected(character);
+        });
+
+        Debug.Log($"[CharacterSelectButton] Setup完了: {character.CharacterName}");
     }
 
-    /// <summary>
-    /// 選択状態の見た目を更新します。
-    /// </summary>
     public void SetSelected(bool isSelected)
     {
         if (_selectedFrame != null)

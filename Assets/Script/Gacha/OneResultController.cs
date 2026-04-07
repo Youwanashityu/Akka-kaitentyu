@@ -8,11 +8,15 @@ using UnityEngine.UI;
 public class OneResultController : MonoBehaviour
 {
     [SerializeField] private Image icon;
-    [SerializeField] private RectTransform animation;
+    [SerializeField] private RectTransform animationTarget;
     [SerializeField] private Image background;
     [SerializeField] private TMP_Text displayName;
     [SerializeField] private Button closeButton;
     [SerializeField] private Button skipButton;
+
+    [Header("レアリティ別SE名")]
+    [SerializeField] private string _normalSEName = "SE_gacya_single_N";
+    [SerializeField] private string _rareSEName = "SE_gacya_single_SR";
 
     private CancellationTokenSource _cts;
 
@@ -20,9 +24,6 @@ public class OneResultController : MonoBehaviour
     // 単発用（スキップボタン非表示）
     // -------------------------------------------------------
 
-    /// <summary>
-    /// 単発ガチャ結果を表示します。スキップボタンは非表示になります。
-    /// </summary>
     public async UniTask ShowResult(ItemDisplayInfo displayInfo, CancellationToken token)
     {
         _cts = _cts.Reset();
@@ -32,6 +33,7 @@ public class OneResultController : MonoBehaviour
         gameObject.SetActive(true);
         SetDisplayInfo(displayInfo);
         PlayAnimation();
+        PlaySE(displayInfo.Tier);
 
         try
         {
@@ -47,9 +49,6 @@ public class OneResultController : MonoBehaviour
     // 10連用（スキップボタン表示）
     // -------------------------------------------------------
 
-    /// <summary>
-    /// 10連ガチャの1件分を表示します。スキップボタンが押されたらtrueを返します。
-    /// </summary>
     public async UniTask<bool> ShowResultWithSkip(ItemDisplayInfo displayInfo, CancellationToken token)
     {
         _cts = _cts.Reset();
@@ -59,17 +58,17 @@ public class OneResultController : MonoBehaviour
         gameObject.SetActive(true);
         SetDisplayInfo(displayInfo);
         PlayAnimation();
+        PlaySE(displayInfo.Tier);
 
         bool skipped = false;
 
         try
         {
-            // 閉じるボタンかスキップボタンのどちらかを待つ
             int result = await UniTask.WhenAny(
                 closeButton.OnClickAsync(linkedToken),
                 skipButton.OnClickAsync(linkedToken)
             );
-            skipped = result == 1; // 1ならスキップボタン
+            skipped = result == 1;
         }
         finally
         {
@@ -85,15 +84,27 @@ public class OneResultController : MonoBehaviour
 
     private void PlayAnimation()
     {
-        animation.DOKill();
-        animation.localScale = Vector3.one * 1.15f;
-        animation.DOScale(Vector3.one, 0.75f).SetEase(Ease.OutQuint);
+        animationTarget.DOKill();
+        animationTarget.localScale = Vector3.one * 1.15f;
+        animationTarget.DOScale(Vector3.one, 0.75f).SetEase(Ease.OutQuint);
     }
 
     private void SetDisplayInfo(ItemDisplayInfo info)
     {
         icon.sprite = info.Icon;
         displayName.text = info.DisplayName;
+    }
+
+    private void PlaySE(ItemTier tier)
+    {
+        if (SoundManager.Instance == null)
+        {
+            Debug.LogWarning("[OneResultController] SoundManager が見つかりません。");
+            return;
+        }
+
+        var seName = tier == ItemTier.R ? _normalSEName : _rareSEName;
+        SoundManager.Instance.PlaySE(seName);
     }
 
     private void OnDestroy()

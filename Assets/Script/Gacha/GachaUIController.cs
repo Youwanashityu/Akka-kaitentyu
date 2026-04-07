@@ -76,7 +76,7 @@ public class GachaUIController : MonoBehaviour
     public void UpdatePickUpButtonImage()
     {
         var selected = GachaManager.Instance.SelectedPickUp;
-        _pickUpButtonImage.sprite = selected != null ? selected.Icon : _pickUpDefaultSprite;
+        _pickUpButtonImage.sprite = selected != null ? selected.PickUpIcon : _pickUpDefaultSprite;
     }
 
     // -------------------------------------------------------

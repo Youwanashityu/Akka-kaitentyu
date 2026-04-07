@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 /// <summary>
 /// プレゼントボタンの制御とアイテムに対応した会話の呼び出しを担うコントローラー。
-/// アイテムごとに初回と2回目以降で会話を切り替えます。
+/// アイテムごと・キャラクターごとに初回と2回目以降で会話を切り替えます。
 /// </summary>
 public class PresentTalkController : MonoBehaviour
 {
@@ -27,18 +27,13 @@ public class PresentTalkController : MonoBehaviour
     [SerializeField] private HomeTalkController _homeTalkController;
     [SerializeField] private GameSettingScriptable _gameSetting;
 
-    [Header("プレゼントCSVファイル名（拡張子なし）")]
-    [SerializeField] private string _presentCsvName = "Lux_Present";
-
     // -------------------------------------------------------
     // 内部状態
     // -------------------------------------------------------
 
     private Dictionary<string, TalkData> _presentTalkData;
     private bool _isTalking = false;
-
-    /// <summary>既にプレゼントしたことがあるアイテムの記録</summary>
-    private readonly HashSet<GachaItem> _presentedItems = new();
+    private string _characterName;
 
     // -------------------------------------------------------
     // ライフサイクル
@@ -46,8 +41,17 @@ public class PresentTalkController : MonoBehaviour
 
     private void Start()
     {
-        _presentTalkData = TalkDataLoader.Load(_presentCsvName);
         _presentButton.onClick.AddListener(OnPresentButtonClicked);
+    }
+
+    // -------------------------------------------------------
+    // キャラクター切り替え
+    // -------------------------------------------------------
+
+    public void SetCharacter(string characterName)
+    {
+        _characterName = characterName;
+        _presentTalkData = TalkDataLoader.Load($"{characterName}_Present");
     }
 
     // -------------------------------------------------------
@@ -73,24 +77,21 @@ public class PresentTalkController : MonoBehaviour
     {
         _isTalking = true;
 
-        // インベントリからアイテムを1つ消費
         GachaManager.Instance.ConsumeItem(item);
 
-        // 初回か2回目以降かでTalkIDを切り替え
+        // キャラクターごとに初回か2回目以降かを判定
         string startID;
-        bool isAgain = _presentedItems.Contains(item);
+        bool isPresented = LoveManager.Instance.IsPresented(_characterName, item);
 
-        if (isAgain && !string.IsNullOrEmpty(item.PresentTalkIDAgain))
-        {
+        if (isPresented && !string.IsNullOrEmpty(item.PresentTalkIDAgain))
             startID = item.PresentTalkIDAgain;
-        }
         else
         {
             startID = item.PresentTalkID;
-            _presentedItems.Add(item);
+            LoveManager.Instance.SetPresented(_characterName, item);
         }
 
-        if (string.IsNullOrEmpty(startID) || !_presentTalkData.ContainsKey(startID))
+        if (string.IsNullOrEmpty(startID) || _presentTalkData == null || !_presentTalkData.ContainsKey(startID))
         {
             Debug.LogWarning($"[PresentTalkController] プレゼント会話が見つかりません: {startID}");
             _isTalking = false;
@@ -100,7 +101,6 @@ public class PresentTalkController : MonoBehaviour
         _talkPlayer.Setup(_presentTalkData);
         await _talkPlayer.Play(startID, token);
 
-        // 好感度加算
         var loveAmount = _gameSetting.GetPresentLoveAmount(item);
         _homeTalkController.AddLovePoint(loveAmount);
 

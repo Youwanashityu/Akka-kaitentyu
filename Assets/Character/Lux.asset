@@ -14,8 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _characterName: Lux
   _gachaItem: {fileID: 11400000, guid: 4b29323cac565d744a894a2c617762c6, type: 2}
+  _isTutorialCharacter: 0
   _defaultSprite: {fileID: 21300000, guid: 7a4140f9c01762e418df62d04e582e57, type: 3}
   _miniDefaultSprite: {fileID: 21300000, guid: 7a4140f9c01762e418df62d04e582e57, type: 3}
+  _selectIconSprite: {fileID: 3064676313817651956, guid: e50f9822cf8ed804992ce30164a6b02a, type: 3}
   _images:
   - ImageTypeName: R_down_exciting
     Sprite: {fileID: 21300000, guid: c4918de24a59b1040b13415d27a4ef09, type: 3}
